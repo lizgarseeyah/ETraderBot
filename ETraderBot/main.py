@@ -20,31 +20,38 @@ ACCESS_TOKEN_SECRET = 'your_access_token_secret'
 REQUEST_TOKEN_URL = 'https://api.etrade.com/oauth/request_token'
 ACCESS_TOKEN_URL = 'https://api.etrade.com/oauth/access_token'
 
+# Define the callback URL for localhost
+REDIRECT_URI = 'http://127.0.0.1:5000/etrade-callback'
+########################################################
 # Step 1: Obtain a request token
 response = requests.post(
     REQUEST_TOKEN_URL,
-    auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET),
+    auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET), 
+    params={'oauth_callback': REDIRECT_URI}  # Add the callback URL as a parameter
 )
+
 for x in response.text.split('&'):
     pair = x.split('=')
     print(pair)
 
 # debug:
 # response_text = response.text
-# print(f"Response Text: {response_text}")
+# print(f"Response Text!!!!!!!: {response_text}")
+########################################################
 
 request_token_data = dict(x.split('=',1) for x in response.text.split('&'))
 # oauth_token = request_token_data['oauth_token']
 oauth_token = request_token_data.get('oauth_token', '')
-# #debug
-# print(request_token_data)
+
+# debug
+# print("HERE'S THE OAUTH TOKEN: ", request_token_data)
 
 oauth_token_secret = request_token_data['oauth_token_secret']
 
 # Step 2: Redirect the user to authorize the app (manual step)
 
 # Step 3: Obtain an access token
-access_token_url = f'{ACCESS_TOKEN_URL}?oauth_token={oauth_token}'
+access_token_url = f'{ACCESS_TOKEN_URL}?oauth_token={oauth_token}&oauth_callback={REDIRECT_URI}'
 response = requests.post(
     access_token_url,
     auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET),
@@ -65,9 +72,23 @@ ACCESS_TOKEN_SECRET = access_token_data['oauth_token_secret']
 
 # Now, you can use ACCESS_TOKEN and ACCESS_TOKEN_SECRET in your API requests
 
+###########################################################################################
+###########################################################################################
+
 # Google Sheets API credentials
 # Replace these with your own credentials
 GOOGLE_SHEETS_API_KEY = 'https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/edit#gid=335423734'
+
+@app.route('/etrade-callback', methods=['GET'])
+def etrade_callback():
+    #Extract OAuth verifiers from the callback URL
+    oauth_verifier = request.args.get('oauth_verifier')
+
+    # For demonstration purposes, just print the verifier
+    print(f'OAuth Verifier: {oauth_verifier}')
+
+    # Return a response (optional)
+    return 'Callback Received Successfully'
 
 @app.route('/')
 def index():
