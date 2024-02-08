@@ -1,18 +1,11 @@
-import requests
-import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
-
-# E*Trade credentials
-ETRADE_API_KEY = '5109a97aec4548ac21a4c0cd80b1f2d9'
-ETRADE_API_SECRET = 'c033d24362c344de6ee38162bfc0d86857b8cd2c44e5887c717931378ac221f2'
-ETRADE_ACCESS_TOKEN = 'your_etrade_access_token'
-ETRADE_ACCESS_TOKEN_SECRET = 'your_etrade_access_token_secret'
+from gspread.exceptions import SpreadsheetNotFound  # Import SpreadsheetNotFound explicitly
 
 # Google Sheets credentials
 GOOGLE_SHEET_CREDS_FILE = '/Users/elizabethgarcia/Documents/ETraderBot/stocktradingproject-7153c47c293e.json'
-GOOGLE_SHEET_NAME = 'https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/edit#gid=35094487'
+GOOGLE_SHEET_NAME = 'Test'
 
 # Function to get screener data from Simfin
 def get_screener_data():
@@ -26,12 +19,19 @@ def get_price_data():
 
 # Function to authenticate and connect to Google Sheets
 def connect_to_google_sheets():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    scope = ['https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_SHEET_CREDS_FILE, scope)
     client = gspread.authorize(creds)
-    sheet = client.open(GOOGLE_SHEET_NAME).sheet1
-    return sheet
-
+    try:
+        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        return sheet
+    except SpreadsheetNotFound:  # Handle the exception
+        print(f"Spreadsheet '{GOOGLE_SHEET_NAME}' not found.")
+        return None
+    except Exception as e:
+        print(f"Error connecting to Google Sheets: {e}")
+        return None
+    
 # Function to add new tickers to Google Sheets for approval
 def add_ticker_to_sheet(sheet, ticker):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -52,6 +52,8 @@ def main():
 
     # Connect to Google Sheets
     sheet = connect_to_google_sheets()
+    if sheet is None:
+        return
 
     # Iterate through screener data
     for stock in screener_data:
