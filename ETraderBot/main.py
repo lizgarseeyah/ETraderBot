@@ -1,116 +1,52 @@
-# Install necessary packages using pip install Flask requests
-
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, jsonify
 import requests
-from requests.auth import HTTPBasicAuth
-from requests_oauthlib import OAuth1
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
-app = Flask(__name__)
+# SimFin API parameters
+simfin_api_key = '65ee5e9c-7f18-42c2-a75a-538e4d5a7e68YOUR_SIMFIN_API_KEY'
+simfin_url = 'https://simfin.com/api/v1/companies'
 
-# Replace these placeholders with your actual credentials
-CONSUMER_KEY = '5109a97aec4548ac21a4c0cd80b1f2d9'
-CONSUMER_SECRET = 'c033d24362c344de6ee38162bfc0d86857b8cd2c44e5887c717931378ac221f2'
-ACCESS_TOKEN = 'your_access_token'
-ACCESS_TOKEN_SECRET = 'your_access_token_secret'
+# Financial Modeling Prep API parameters
+fmp_api_key = 'YOUR_FMP_API_KEY'
+fmp_url = 'https://financialmodelingprep.com/api/v3/quote/'
 
-# E*TRADE API endpoints
-REQUEST_TOKEN_URL = 'https://api.etrade.com/oauth/request_token'
-ACCESS_TOKEN_URL = 'https://api.etrade.com/oauth/access_token'
+# E*Trade API parameters
+etrade_api_key = 'YOUR_ETRADE_API_KEY'
+etrade_api_secret = 'YOUR_ETRADE_API_SECRET'
+etrade_oauth_token = 'YOUR_ETRADE_OAUTH_TOKEN'  # Obtain through OAuth process
+etrade_account_id = 'YOUR_ETRADE_ACCOUNT_ID'
 
-# Define the callback URL for localhost
-REDIRECT_URI = 'http://127.0.0.1:5000/etrade-callback'
-########################################################
-# Step 1: Obtain a request token
-response = requests.post(
-    REQUEST_TOKEN_URL,
-    auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET), 
-    params={'oauth_callback': REDIRECT_URI}  # Add the callback URL as a parameter
-)
+# Symbol for the company you want to fetch data for
+symbol = 'AAPL'
 
-for x in response.text.split('&'):
-    pair = x.split('=')
-    print(pair)
+# Fetching screener data from SimFin
+simfin_response = requests.get(simfin_url, params={'api-key': simfin_api_key, 'ticker': symbol})
+simfin_data = simfin_response.json()
 
-# debug:
-# response_text = response.text
-# print(f"Response Text!!!!!!!: {response_text}")
-########################################################
+# Fetching price data from Financial Modeling Prep
+fmp_response = requests.get(fmp_url + symbol, params={'apikey': fmp_api_key})
+fmp_data = fmp_response.json()
 
-request_token_data = dict(x.split('=',1) for x in response.text.split('&'))
-# oauth_token = request_token_data['oauth_token']
-oauth_token = request_token_data.get('oauth_token', '')
+# Analyze the data and make trading decisions
+# Example: Buy if price is low and fundamentals are strong
+if simfin_response.status_code == 200 and fmp_response.status_code == 200:
+    # Process simfin_data and fmp_data to make trading decisions
+    if should_buy(simfin_data, fmp_data):
+        execute_trade(etrade_api_key, etrade_api_secret, etrade_oauth_token, etrade_account_id, symbol, 'buy')
+    elif should_sell(simfin_data, fmp_data):
+        execute_trade(etrade_api_key, etrade_api_secret, etrade_oauth_token, etrade_account_id, symbol, 'sell')
+else:
+    print("Failed to fetch data from one of the APIs")
 
-# debug
-# print("HERE'S THE OAUTH TOKEN: ", request_token_data)
+# Function to execute trade with E*Trade
+def execute_trade(api_key, api_secret, oauth_token, account_id, symbol, action):
+    # Implement E*Trade trade execution logic
+    pass
 
-oauth_token_secret = request_token_data['oauth_token_secret']
+# Function to analyze data and make trading decisions
+def should_buy(simfin_data, fmp_data):
+    # Implement logic to decide whether to buy
+    pass
 
-# Step 2: Redirect the user to authorize the app (manual step)
-
-# Step 3: Obtain an access token
-access_token_url = f'{ACCESS_TOKEN_URL}?oauth_token={oauth_token}&oauth_callback={REDIRECT_URI}'
-response = requests.post(
-    access_token_url,
-    auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET),
-    data={'oauth_verifier': 'verifier_code'},  # Replace 'verifier_code' with the actual verifier code obtained during user authorization
-)
-
-# Debugging to identify the issue
-# for x in response.text.split('&'):
-#     pair = x.split('=')
-#     print(pair)
-    
-# access_token_data = dict(x.split('=',1) for x in response.text.split('&'))
-access_token_data = dict((x.split('=', 1) if '=' in x else (x, None)) for x in response.text.split('&'))
-print(access_token_data)
-oauth_token = request_token_data.get('oauth_token', '')
-# ACCESS_TOKEN = access_token_data['oauth_token']
-ACCESS_TOKEN_SECRET = access_token_data['oauth_token_secret']
-
-# Now, you can use ACCESS_TOKEN and ACCESS_TOKEN_SECRET in your API requests
-
-###########################################################################################
-###########################################################################################
-
-# Google Sheets API credentials
-# Replace these with your own credentials
-GOOGLE_SHEETS_API_KEY = 'https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/edit#gid=335423734'
-
-@app.route('/etrade-callback', methods=['GET'])
-def etrade_callback():
-    #Extract OAuth verifiers from the callback URL
-    oauth_verifier = request.args.get('oauth_verifier')
-
-    # For demonstration purposes, just print the verifier
-    print(f'OAuth Verifier: {oauth_verifier}')
-
-    # Return a response (optional)
-    return 'Callback Received Successfully'
-
-@app.route('/')
-def index():
-    return render_template('dashboard.html')
-
-@app.route('/get_account_info')
-def get_account_info():
-    url = 'https://api.etrade.com/v1/accounts'
-    headers = {'Content-Type': 'application/json'}
-    auth = HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET)
-    params = {'oauth_token': ACCESS_TOKEN, 'oauth_token_secret': ACCESS_TOKEN_SECRET}
-    response = requests.get(url, headers=headers, auth=auth, params=params)
-    account_info = response.json()
-    return jsonify(account_info)
-
-@app.route('/update_google_sheets', methods=['POST'])
-def update_google_sheets():
-    data = request.get_json()
-    # Implement logic to update Google Sheets using the provided data
-    # You may use the Google Sheets API or a library like gspread
-
-    return jsonify({'status': 'success'})
-
-if __name__ == '__main__':
-    app.run(debug=True)
+def should_sell(simfin_data, fmp_data):
+    # Implement logic to decide whether to sell
+    pass
+ r
