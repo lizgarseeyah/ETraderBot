@@ -1,52 +1,74 @@
 import requests
+import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 
-# SimFin API parameters
-simfin_api_key = '65ee5e9c-7f18-42c2-a75a-538e4d5a7e68YOUR_SIMFIN_API_KEY'
-simfin_url = 'https://simfin.com/api/v1/companies'
+# E*Trade credentials
+ETRADE_API_KEY = '5109a97aec4548ac21a4c0cd80b1f2d9'
+ETRADE_API_SECRET = 'c033d24362c344de6ee38162bfc0d86857b8cd2c44e5887c717931378ac221f2'
+ETRADE_ACCESS_TOKEN = 'your_etrade_access_token'
+ETRADE_ACCESS_TOKEN_SECRET = 'your_etrade_access_token_secret'
 
-# Financial Modeling Prep API parameters
-fmp_api_key = 'YOUR_FMP_API_KEY'
-fmp_url = 'https://financialmodelingprep.com/api/v3/quote/'
+# Google Sheets credentials
+GOOGLE_SHEET_CREDS_FILE = '/Users/elizabethgarcia/Documents/ETraderBot/stocktradingproject-7153c47c293e.json'
+GOOGLE_SHEET_NAME = 'https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/edit#gid=35094487'
 
-# E*Trade API parameters
-etrade_api_key = 'YOUR_ETRADE_API_KEY'
-etrade_api_secret = 'YOUR_ETRADE_API_SECRET'
-etrade_oauth_token = 'YOUR_ETRADE_OAUTH_TOKEN'  # Obtain through OAuth process
-etrade_account_id = 'YOUR_ETRADE_ACCOUNT_ID'
-
-# Symbol for the company you want to fetch data for
-symbol = 'AAPL'
-
-# Fetching screener data from SimFin
-simfin_response = requests.get(simfin_url, params={'api-key': simfin_api_key, 'ticker': symbol})
-simfin_data = simfin_response.json()
-
-# Fetching price data from Financial Modeling Prep
-fmp_response = requests.get(fmp_url + symbol, params={'apikey': fmp_api_key})
-fmp_data = fmp_response.json()
-
-# Analyze the data and make trading decisions
-# Example: Buy if price is low and fundamentals are strong
-if simfin_response.status_code == 200 and fmp_response.status_code == 200:
-    # Process simfin_data and fmp_data to make trading decisions
-    if should_buy(simfin_data, fmp_data):
-        execute_trade(etrade_api_key, etrade_api_secret, etrade_oauth_token, etrade_account_id, symbol, 'buy')
-    elif should_sell(simfin_data, fmp_data):
-        execute_trade(etrade_api_key, etrade_api_secret, etrade_oauth_token, etrade_account_id, symbol, 'sell')
-else:
-    print("Failed to fetch data from one of the APIs")
-
-# Function to execute trade with E*Trade
-def execute_trade(api_key, api_secret, oauth_token, account_id, symbol, action):
-    # Implement E*Trade trade execution logic
+# Function to get screener data from Simfin
+def get_screener_data():
+    # Implement code to fetch screener data from Simfin
     pass
 
-# Function to analyze data and make trading decisions
-def should_buy(simfin_data, fmp_data):
-    # Implement logic to decide whether to buy
+# Function to get price data from financialmodelingprep
+def get_price_data():
+    # Implement code to fetch price data from financialmodelingprep
     pass
 
-def should_sell(simfin_data, fmp_data):
-    # Implement logic to decide whether to sell
+# Function to authenticate and connect to Google Sheets
+def connect_to_google_sheets():
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_SHEET_CREDS_FILE, scope)
+    client = gspread.authorize(creds)
+    sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+    return sheet
+
+# Function to add new tickers to Google Sheets for approval
+def add_ticker_to_sheet(sheet, ticker):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    sheet.append_row([timestamp, ticker])
+
+# Function to trade using E*Trade
+def trade(ticker, action, quantity):
+    # Implement code to execute trades using E*Trade API
     pass
- 
+
+# Main function
+def main():
+    # Get screener data from Simfin
+    screener_data = get_screener_data()
+
+    # Get price data from financialmodelingprep
+    price_data = get_price_data()
+
+    # Connect to Google Sheets
+    sheet = connect_to_google_sheets()
+
+    # Iterate through screener data
+    for stock in screener_data:
+        ticker = stock['ticker']
+        # Check if the ticker is already in Google Sheets
+        if ticker not in [row[1] for row in sheet.get_all_values()]:
+            # Add the new ticker to Google Sheets for approval
+            add_ticker_to_sheet(sheet, ticker)
+        else:
+            # Check if the fundamentals look good but notify for approval
+            if stock['fundamentals'] == 'good' and stock['fraud'] == 'potential':
+                # Notify for approval
+                print(f"New ticker {ticker} with potential fraud. Please approve.")
+
+    # Implement trading logic based on screener and price data
+    # For example:
+    # trade('AAPL', 'buy', 10)
+
+if __name__ == "__main__":
+    main()

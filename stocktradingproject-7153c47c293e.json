@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "stocktradingproject",
+  "private_key_id": "7153c47c293e1e855590f0c0c42d141c1aa15d88",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC1FhFNWT8VFhg4\nAnH1o9K9Y00Byp00o2KlqYDLBHBFTcQ3qdc1YLak+XJKcoPtyL4zr1ZiF4UvWNkp\nntAyDMP3r0STlThvI2h2pMsdwDcpHkflMHubtpTM5vvNfD0CtvlyOI8nMGCGej1E\n67zhMN/OQI5q0aTEBNpoRaBVlmVZ5dmYCohsQiSBqOI9rEvA78qSZM9MrAk+sAuF\nhsYYPI57PYjVqMvFr8y3BC8jPtg/w2mNnakfIM3xKbxpUlgkd7F3saUsvn1G7DIR\nch1Xtue0cVZngetLHuWQlvPDvOki4zrjfQmStByeb5qa6+m9CxBH4oa1lJYEa0of\nq2UifV2LAgMBAAECggEAMMZE2sSTDSbqVwuxjiwV8xTwBO+B8E+hnmVNX2FOrBwK\nIcQJR0NJbp4RfqPhjQZo1JsBdWJIaTxRIbi48wIlNm1q1yV2EdlDpdE1NEo1kUmq\nq7ynToWbBqWgZPR1qmmGPpGlXTTWiuIZ5ppoQW9cmL0invrgmjuEaFl4mhTsL44Y\nMqKJ+cyUgzVPYInWOtiMChPn/2u4JG5AX3JtadojiKq30AI9Gr3vlxiBSNRDvwem\n8l4HMvTpxFMHwnj3kN3sCcaZYezxCaXVcH9I1KGnmeiJWwODHtXsSN8SK8b83E1V\n4ktWX22EQuIPODJM7zADozWcDtIhL3oe0lEfH0xKAQKBgQD3nG2DYM/IgH7rtGEP\ny+gB7Q+wIh1C6q8Fom3s0O2j1xCqGkJH9ubcSqeIoG4WdEPpYtjPio5VpFFqgurF\nba4mD4I+fpTYoFUUyJLHMTL11OKYX5Zi6E7IiY0F4L39CJbLu3FrGw8uMxrzGPQy\nUd5isW9w/Ac856t5EXe/VCW1QQKBgQC7OKic6T3TkS1n+lauHJx7DD5o2We9c0t/\nKYoDvPW8BKwFnhNP0PH6Cb4pEreDnjNcwF0axRE2Uwphtw66xcpX9MOhQ2PI3qUM\n1XqrT5vXfCAvY8vFJZjIwX5eu9JrRZm6+z5eU2OsklaJxgzCA1J1vCNjoGbjGIZL\nglblq17jywKBgQC1tUfwp7UT8KgzlPW9v+eMsklW+lH673ptahu9ND2QhJ0oF4kY\ngqo8c1SqwQDI3Z2QwgdVltqJIsLUpSpgo/Ku36a28fGNX2vQiricERDSst1u8IbO\nIqjeJYMmEx2ZeRogfHfpH7xuLPbT+zYJT2chihC8G1e8bE671APKlpftgQKBgQCw\nCkOJX0tSPwUZ6utMRfzhOo8IWbxRCDMp+64Ze7j4NNBna86u00JkIHsc9ct2x+91\nvC8Pd9OKaCSv4sfH2Sk88Rpt7QbLnoZFfgodQPrBcKZ2yPiWhJaX1lDz1NmzIju9\n9HYdjX2AjA0w+PeQCj2kFOaVzAJScQH9yC3bQPs1ZwKBgQClCVDumTYirHG58ONX\nID+noMCnFIfSR26E8fWVCAdIfnYgxbbEDqLBmT2+SWK3BOQXyE1BqIs/UuNV9fap\neSPVcxlxY6MiCmV/QO61uj7PraKwCloWLxSUunZHzu6c3kKZK/j1J3pySQr40rsK\n25AfQ1Y7cP5t7vCzhR8HozoQuQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "stockprogramserviceaccount@stocktradingproject.iam.gserviceaccount.com",
+  "client_id": "103607841258579781212",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/stockprogramserviceaccount%40stocktradingproject.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
