@@ -25,7 +25,8 @@ def connect_to_google_sheets():
     print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
-        sheet = client.open(GOOGLE_SHEET_ID).sheet1
+        # sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
         return sheet
     except SpreadsheetNotFound as e:  # Handle the exception
         print(f"Spreadsheet '{GOOGLE_SHEET_ID}' not found.")
