@@ -21,6 +21,7 @@ def get_price_data():
 def connect_to_google_sheets():
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_SHEET_CREDS_FILE, scope)
+    print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
         sheet = client.open(GOOGLE_SHEET_NAME).sheet1
