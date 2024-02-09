@@ -25,8 +25,9 @@ def connect_to_google_sheets():
     try:
         sheet = client.open(GOOGLE_SHEET_NAME).sheet1
         return sheet
-    except SpreadsheetNotFound:  # Handle the exception
+    except SpreadsheetNotFound as e:  # Handle the exception
         print(f"Spreadsheet '{GOOGLE_SHEET_NAME}' not found.")
+        print(e)
         return None
 
 # Function to add new tickers to Google Sheets for approval
