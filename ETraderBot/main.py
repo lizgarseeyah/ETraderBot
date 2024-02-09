@@ -17,6 +17,7 @@ def get_price_data():
     # Implement code to fetch price data from financialmodelingprep
     pass
 
+GOOGLE_SHEET_ID = '1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4'
 # Function to authenticate and connect to Google Sheets
 def connect_to_google_sheets():
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
@@ -24,10 +25,10 @@ def connect_to_google_sheets():
     print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
-        sheet = client.open(GOOGLE_SHEET_NAME).sheet1
+        sheet = client.open(GOOGLE_SHEET_ID).sheet1
         return sheet
     except SpreadsheetNotFound as e:  # Handle the exception
-        print(f"Spreadsheet '{GOOGLE_SHEET_NAME}' not found.")
+        print(f"Spreadsheet '{GOOGLE_SHEET_ID}' not found.")
         print(e)
         return None
     except gspread.exceptions.APIError as e:  # Handle general API errors
