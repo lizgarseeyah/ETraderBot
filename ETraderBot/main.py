@@ -19,7 +19,7 @@ def get_price_data():
 
 # Function to authenticate and connect to Google Sheets
 def connect_to_google_sheets():
-    scope = ['https://docs.google.com/spreadsheets/d/1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4/', 'https://www.googleapis.com/auth/drive']
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_SHEET_CREDS_FILE, scope)
     client = gspread.authorize(creds)
     try:
@@ -28,10 +28,7 @@ def connect_to_google_sheets():
     except SpreadsheetNotFound:  # Handle the exception
         print(f"Spreadsheet '{GOOGLE_SHEET_NAME}' not found.")
         return None
-    except Exception as e:
-        print(f"Error connecting to Google Sheets: {e}")
-        return None
-    
+
 # Function to add new tickers to Google Sheets for approval
 def add_ticker_to_sheet(sheet, ticker):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
