@@ -9,8 +9,14 @@ GOOGLE_SHEET_NAME = 'Test'
 
 # Function to get screener data from Simfin
 def get_screener_data():
-    # Implement code to fetch screener data from Simfin
-    pass
+    # Example implementation fetching screener data from Simfin
+    # Replace this with your actual implementation
+    screener_data = [
+        {'ticker': 'AAPL', 'fundamentals': 'good', 'fraud': 'potential'},
+        {'ticker': 'GOOG', 'fundamentals': 'good', 'fraud': 'potential'},
+        {'ticker': 'MSFT', 'fundamentals': 'good', 'fraud': 'potential'},
+    ]
+    return screener_data
 
 # Function to get price data from financialmodelingprep
 def get_price_data():
