@@ -30,7 +30,10 @@ def connect_to_google_sheets():
         print(f"Spreadsheet '{GOOGLE_SHEET_NAME}' not found.")
         print(e)
         return None
-
+    except gspread.exceptions.APIError as e:  # Handle general API errors
+        print("Error accessing Google Sheets API:", e)
+        return None
+    
 # Function to add new tickers to Google Sheets for approval
 def add_ticker_to_sheet(sheet, ticker):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
