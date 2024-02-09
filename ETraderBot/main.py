@@ -32,8 +32,11 @@ def connect_to_google_sheets():
         print(f"Spreadsheet '{GOOGLE_SHEET_ID}' not found.")
         print(e)
         return None
-    except gspread.exceptions.APIError as e:  # Handle general API errors
-        print("Error accessing Google Sheets API:", e)
+    except gspread.exceptions.APIError as e:
+        if e.response['status'] == 403:
+            print("Permission error: The caller does not have permission to access the spreadsheet.")
+        else:
+            print("Error accessing Google Sheets API:", e)
         return None
     
 # Function to add new tickers to Google Sheets for approval
