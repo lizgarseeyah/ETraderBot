@@ -20,17 +20,26 @@ def get_screener_data():
     return screener_data
 
 # Function to get price data from financialmodelingprep
-def get_price_data(tickers):
+def get_price_data(tickers, api_key):
     price_data = {}
     for ticker in tickers:
-        url = f'https://financialmodelingprep.com/api/v3/stock/real-time-price/{ticker}'
+        url = f'https://financialmodelingprep.com/api/v3/stock/real-time-price/{ticker}?apikey={api_key}'
+        print("URL:", url)  # Debug print to check the URL
         response = requests.get(url)
+        print("Response:", response.text)  # Debug print to check the response data
         if response.status_code == 200:
             data = response.json()
-            if 'price' in data:
-                price_data[ticker] = data['price']
+            if 'companiesPriceList' in data:
+                for company_data in data['companiesPriceList']:
+                    if 'symbol' in company_data and 'price' in company_data:
+                        if company_data['symbol'] == ticker:
+                            price_data[ticker] = company_data['price']
+                            break
+                else:
+                    print(f"No price data available for {ticker}.")
+                    price_data[ticker] = None
             else:
-                print(f"No price data available for {ticker}.")
+                print(f"Failed to fetch price data for {ticker}.")
                 price_data[ticker] = None
         else:
             print(f"Failed to fetch price data for {ticker}. Status code: {response.status_code}")
@@ -73,9 +82,10 @@ def main():
     # Get screener data from Simfin
     screener_data = get_screener_data()
 
+    api_key = "04a5b23790b95f70a2d7f1423f337528"
     # Get price data from financialmodelingprep
     tickers = [stock['ticker'] for stock in screener_data]
-    price_data = get_price_data(tickers)
+    price_data = get_price_data(tickers, api_key)
 
     # Connect to Google Sheets
     sheet = connect_to_google_sheets("Stock_Tracker")
@@ -104,10 +114,6 @@ def main():
             if stock['fundamentals'] == 'good' and stock['fraud'] == 'potential':
                 # Notify for approval
                 print(f"New ticker {ticker} with potential fraud. Please approve.")
-
-    # Implement trading logic based on screener and price data
-    # For example:
-    # trade('AAPL', 'buy', 10)
 
 if __name__ == "__main__":
     main()
