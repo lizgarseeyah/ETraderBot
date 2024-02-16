@@ -1,5 +1,7 @@
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+# from oauth2client.service_account import ServiceAccountCredentials
+# from google.auth.credentials import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 from datetime import datetime
 from gspread.exceptions import SpreadsheetNotFound  # Import SpreadsheetNotFound explicitly
 
@@ -25,14 +27,15 @@ def get_price_data():
 
 GOOGLE_SHEET_ID = '1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4'
 # Function to authenticate and connect to Google Sheets
-def connect_to_google_sheets():
+def connect_to_google_sheets(tab_name):
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_SHEET_CREDS_FILE, scope)
+    creds = ServiceAccountCredentials.from_service_account_file(GOOGLE_SHEET_CREDS_FILE, scopes=scope)
     print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
         # sheet = client.open(GOOGLE_SHEET_NAME).sheet1
-        sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
+        # sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
+        sheet = client.open_by_key(GOOGLE_SHEET_ID).worksheet(tab_name)
         return sheet
     except SpreadsheetNotFound as e:  # Handle the exception
         print(f"Spreadsheet '{GOOGLE_SHEET_ID}' not found.")
@@ -64,7 +67,7 @@ def main():
     price_data = get_price_data()
 
     # Connect to Google Sheets
-    sheet = connect_to_google_sheets()
+    sheet = connect_to_google_sheets("Stock_Tracker")
     if sheet is None:
         return
 
@@ -72,7 +75,11 @@ def main():
     for stock in screener_data:
         ticker = stock['ticker']
         # Check if the ticker is already in Google Sheets
-        if ticker not in [row[1] for row in sheet.get_all_values()]:
+        values = sheet.get_all_values()
+        if not values:
+            # Sheet is empty, no need to check for ticker
+            add_ticker_to_sheet(sheet, ticker)
+        elif ticker not in [row[1] for row in values if len(row) >= 2]:
             # Add the new ticker to Google Sheets for approval
             add_ticker_to_sheet(sheet, ticker)
         else:
