@@ -1,6 +1,4 @@
 import gspread
-# from oauth2client.service_account import ServiceAccountCredentials
-# from google.auth.credentials import ServiceAccountCredentials
 from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 from datetime import datetime
 from gspread.exceptions import SpreadsheetNotFound  # Import SpreadsheetNotFound explicitly
@@ -33,8 +31,6 @@ def connect_to_google_sheets(tab_name):
     print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
-        # sheet = client.open(GOOGLE_SHEET_NAME).sheet1
-        # sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
         sheet = client.open_by_key(GOOGLE_SHEET_ID).worksheet(tab_name)
         return sheet
     except SpreadsheetNotFound as e:  # Handle the exception
