@@ -1,4 +1,5 @@
 import gspread
+import requests
 from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 from datetime import datetime
 from gspread.exceptions import SpreadsheetNotFound  # Import SpreadsheetNotFound explicitly
@@ -19,16 +20,29 @@ def get_screener_data():
     return screener_data
 
 # Function to get price data from financialmodelingprep
-def get_price_data():
-    # Implement code to fetch price data from financialmodelingprep
-    pass
+def get_price_data(tickers):
+    price_data = {}
+    for ticker in tickers:
+        url = f'https://financialmodelingprep.com/api/v3/stock/real-time-price/{ticker}'
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            if 'price' in data:
+                price_data[ticker] = data['price']
+            else:
+                print(f"No price data available for {ticker}.")
+                price_data[ticker] = None
+        else:
+            print(f"Failed to fetch price data for {ticker}. Status code: {response.status_code}")
+            price_data[ticker] = None
+    return price_data
 
 GOOGLE_SHEET_ID = '1WPv4K7GNxwX8HnwXfTvAwCwI19hsQVAZ2ARSNxufoy4'
 # Function to authenticate and connect to Google Sheets
 def connect_to_google_sheets(tab_name):
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_service_account_file(GOOGLE_SHEET_CREDS_FILE, scopes=scope)
-    print("Credentials:", creds)  # Print credentials for debugging
+    # print("Credentials:", creds)  # Print credentials for debugging
     client = gspread.authorize(creds)
     try:
         sheet = client.open_by_key(GOOGLE_SHEET_ID).worksheet(tab_name)
@@ -60,7 +74,8 @@ def main():
     screener_data = get_screener_data()
 
     # Get price data from financialmodelingprep
-    price_data = get_price_data()
+    tickers = [stock['ticker'] for stock in screener_data]
+    price_data = get_price_data(tickers)
 
     # Connect to Google Sheets
     sheet = connect_to_google_sheets("Stock_Tracker")
@@ -70,6 +85,12 @@ def main():
     # Iterate through screener data
     for stock in screener_data:
         ticker = stock['ticker']
+        price = price_data.get(ticker)
+        if price is not None:
+            # Add pricing data to Google Sheets
+            sheet.append_row([ticker, price])
+        else:
+            print(f"No price data available for {ticker}.")
         # Check if the ticker is already in Google Sheets
         values = sheet.get_all_values()
         if not values:
